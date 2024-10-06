@@ -53,26 +53,34 @@ const Buttons = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-400 to-purple-500 text-white">Loading...</div>;
   }
 
   if (!auth.currentUser) {
-    return <div className="flex justify-center items-center h-screen">You need to be logged in to control relays.</div>;
+    return <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-400 to-purple-500 text-white">You need to be logged in to control relays.</div>;
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <header className="bg-white shadow-sm p-4">
-        <h1 className="text-center text-xl font-bold">Control Your Devices</h1>
+    <div className="flex flex-col min-h-screen bg-gradient-to-r from-blue-400 to-purple-500">
+      <header className="bg-white shadow-md p-6">
+        <h1 className="text-center text-3xl font-bold text-gray-800">
+          Control Your Devices
+        </h1>
+        <div className="w-16 h-1 bg-blue-500 mx-auto mt-2 rounded-full"></div>
       </header>
       
       <main className="flex-grow p-4">
         <div className="grid grid-cols-1 gap-4 mb-6">
           {Object.keys(relays).map((relayId) => (
-            <div key={relayId} className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
+            <div key={relayId} className="bg-white p-4 rounded-lg shadow-lg flex justify-between items-center">
               <div>
                 <h2 className="text-lg font-semibold">{relays[relayId].device}</h2>
-                <p className="text-sm text-gray-600">Status: {relays[relayId].state ? "ON" : "OFF"}</p>
+                <p className="text-sm">
+                  Status: 
+                  <span className={relays[relayId].state ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                    {relays[relayId].state ? " ON" : " OFF"}
+                  </span>
+                </p>
               </div>
               <label className="inline-flex items-center cursor-pointer">
                 <input
@@ -87,13 +95,13 @@ const Buttons = () => {
           ))}
         </div>
         
-        <Link to="/add-relay" className="block text-center text-blue-500 hover:text-blue-600 font-semibold mb-4">
+        <Link to="/add-relay" className="block text-center text-white hover:text-gray-200 font-semibold mb-4">
           Add Devices
         </Link>
         
         <button
           onClick={handleLogout}
-          className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded"
+          className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded shadow-lg"
         >
           Logout
         </button>

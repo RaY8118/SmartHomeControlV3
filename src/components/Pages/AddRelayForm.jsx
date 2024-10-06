@@ -75,81 +75,82 @@ const AddRelayForm = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-400 to-purple-500 text-white">Loading...</div>;
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <header className="bg-white shadow-sm p-4">
-        <h1 className="text-center text-xl font-bold">Manage Devices</h1>
+    <div className="flex flex-col min-h-screen bg-gradient-to-r from-blue-400 to-purple-500">
+      <header className="bg-white shadow-md p-6">
+        <h1 className="text-center text-3xl font-bold text-gray-800">
+          Manage Devices
+        </h1>
+        <div className="w-16 h-1 bg-blue-500 mx-auto mt-2 rounded-full"></div>
       </header>
 
       <main className="flex-grow p-4">
-        <form onSubmit={handleSubmit} className="mb-6">
-          <div className="mb-4 relative">
-            <label
-              htmlFor="deviceName"
-              className="block text-sm font-medium text-gray-700 mb-2"
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <form onSubmit={handleSubmit} className="mb-6">
+            <div className="mb-4 relative">
+              <label
+                htmlFor="deviceName"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Device Name
+              </label>
+              <input
+                type="text"
+                id="deviceName"
+                value={deviceName}
+                onChange={handleDeviceNameChange}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                placeholder="Enter device name"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+              {showSuggestions && (
+                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1">
+                  {suggestedDevices.map((suggestion, index) => (
+                    <li
+                      key={index}
+                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      {suggestion}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded shadow-lg"
             >
-              Device Name
-            </label>
-            <input
-              type="text"
-              id="deviceName"
-              value={deviceName}
-              onChange={handleDeviceNameChange}
-              onFocus={() => setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              placeholder="Enter device name"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-            {showSuggestions && (
-              <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1">
-                {suggestedDevices.map((suggestion, index) => (
-                  <li
-                    key={index}
-                    className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => handleSuggestionClick(suggestion)}
-                  >
-                    {suggestion}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded"
-          >
-            Add Device
-          </button>
-        </form>
+              Add Device
+            </button>
+          </form>
 
-        <div className="mt-8">
-          <h2 className="text-lg font-semibold mb-4">Existing Devices</h2>
-          <ul className="space-y-2">
-            {Object.entries(existingRelays).map(([relayId, relay]) => (
-              <li key={relayId} className="flex justify-between items-center bg-white p-3 rounded-md shadow">
-                <span>{relay.device}</span>
-                <button
-                  onClick={() => handleDeleteRelay(relayId)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold mb-4">Existing Devices</h2>
+            <ul className="space-y-2">
+              {Object.entries(existingRelays).map(([relayId, relay]) => (
+                <li key={relayId} className="flex justify-between items-center bg-gray-100 p-3 rounded-md shadow">
+                  <span>{relay.device}</span>
+                  <button
+                    onClick={() => handleDeleteRelay(relayId)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <Link
           to="/dashboard"
-          className="block text-center text-blue-500 hover:text-blue-600 font-semibold mt-6"
+          className="block text-center text-white hover:text-gray-200 font-semibold mt-6"
         >
           Back to Dashboard
         </Link>
