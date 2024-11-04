@@ -1,12 +1,19 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
-import Buttons from './components/Pages/Buttons';
-import AddRelayForm from './components/Pages/AddRelayForm';
-import Login from './components/Auth/Login';
-import Register from './components/Auth/Register';
-import { auth } from './services/firebaseConfig';
-import { useRegisterSW } from 'virtual:pwa-register/react';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import Buttons from "./components/Pages/Buttons";
+import AddRelayForm from "./components/Pages/AddRelayForm";
+import Login from "./components/Auth/Login";
+import Register from "./components/Auth/Register";
+import { auth } from "./services/firebaseConfig";
+import { useRegisterSW } from "virtual:pwa-register/react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function PrivateRoute({ children }) {
   const navigate = useNavigate();
@@ -14,7 +21,7 @@ function PrivateRoute({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        navigate('/login');  // Redirect to login if user is not authenticated
+        navigate("/login"); // Redirect to login if user is not authenticated
       }
     });
 
@@ -31,10 +38,10 @@ function App() {
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
-      console.log('SW Registered: ' + r);
+      console.log("SW Registered: " + r);
     },
     onRegisterError(error) {
-      console.log('SW registration error', error);
+      console.log("SW registration error", error);
     },
   });
 
@@ -45,38 +52,52 @@ function App() {
 
   useEffect(() => {
     if (offlineReady) {
-      console.log('Your app is ready to work offline');
+      console.log("Your app is ready to work offline");
     }
     if (needRefresh) {
-      console.log('A new version of the app is available');
+      console.log("A new version of the app is available");
     }
   }, [offlineReady, needRefresh]);
 
   return (
-    <Router>
-      <div>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <Buttons />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/add-relay"
-            element={
-              <PrivateRoute>
-                <AddRelayForm />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </div>
-    </Router>
+    <>
+      <ToastContainer
+        position="top-center"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+      <Router>
+        <div>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Buttons />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/add-relay"
+              element={
+                <PrivateRoute>
+                  <AddRelayForm />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </div>
+      </Router>
+    </>
   );
 }
 

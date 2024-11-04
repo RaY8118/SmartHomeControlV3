@@ -2,7 +2,9 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../services/firebaseConfig";
 import { useNavigate, Link } from "react-router-dom";
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,10 +16,11 @@ const Login = () => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      toast.success("Logged in successfully!!");
       navigate("/dashboard");
     } catch (error) {
+      toast.error(`Error logging in : ${error}`);
       console.error("Error logging in:", error);
-      alert("Error logging in: " + error.message);
     }
   };
 

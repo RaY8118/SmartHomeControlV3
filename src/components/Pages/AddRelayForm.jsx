@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { addRelay, fetchRelays, deleteRelay } from "../../controller/dbController";
+import {
+  addRelay,
+  fetchRelays,
+  deleteRelay,
+} from "../../controller/dbController";
 import { auth } from "../../services/firebaseConfig";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddRelayForm = () => {
   const [deviceName, setDeviceName] = useState("");
@@ -21,31 +27,45 @@ const AddRelayForm = () => {
   ];
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      fetchRelays(user.uid)
-        .then((relays) => {
+    const fetchRelaysData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const relays = await fetchRelays(user.uid);
           setExistingRelays(relays || {});
           const relayIds = Object.keys(relays || {}).map(Number);
           const maxRelayId = relayIds.length ? Math.max(...relayIds) : 0;
           setNextRelayId(maxRelayId + 1);
+        } catch (error) {
+          console.error("Error fetching devices:", error);
+          toast.error("Error fetching devices. Please try again.");
+        } finally {
           setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching relays:", error);
-          setLoading(false);
-        });
-    }
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    fetchRelaysData();
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (nextRelayId && deviceName) {
-      addRelay(nextRelayId, deviceName.toUpperCase());
-      setExistingRelays(prev => ({...prev, [nextRelayId]: {device: deviceName.toUpperCase()}}));
-      setNextRelayId(nextRelayId + 1);
-      setDeviceName("");
-      alert("Relay added successfully!");
+      try {
+        await addRelay(nextRelayId, deviceName.toUpperCase());
+        setExistingRelays((prev) => ({
+          ...prev,
+          [nextRelayId]: { device: deviceName.toUpperCase() },
+        }));
+        setNextRelayId(nextRelayId + 1);
+        setDeviceName("");
+        toast.success("Device added successfully!");
+      } catch (error) {
+        console.error("Error adding device:", error);
+        toast.error("Error adding device. Please try again.");
+      }
     }
   };
 
@@ -58,24 +78,29 @@ const AddRelayForm = () => {
     setShowSuggestions(false);
   };
 
-  const handleDeleteRelay = (relayId) => {
+  const handleDeleteRelay = async (relayId) => {
     if (window.confirm("Are you sure you want to delete this device?")) {
-      deleteRelay(relayId).then(() => {
-        setExistingRelays(prev => {
-          const newRelays = {...prev};
+      try {
+        await deleteRelay(relayId);
+        setExistingRelays((prev) => {
+          const newRelays = { ...prev };
           delete newRelays[relayId];
           return newRelays;
         });
-        alert("Device deleted successfully!");
-      }).catch(error => {
-        console.error("Error deleting relay:", error);
-        alert("Error deleting device. Please try again.");
-      });
+        toast.success("Device deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting devvice:", error);
+        toast.error("Error deleting device. Please try again.");
+      }
     }
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-400 to-purple-500 text-white">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen bg-gradient-to-r from-blue-400 to-purple-500 text-white">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -134,7 +159,10 @@ const AddRelayForm = () => {
             <h2 className="text-lg font-semibold mb-4">Existing Devices</h2>
             <ul className="space-y-2">
               {Object.entries(existingRelays).map(([relayId, relay]) => (
-                <li key={relayId} className="flex justify-between items-center bg-gray-100 p-3 rounded-md shadow">
+                <li
+                  key={relayId}
+                  className="flex justify-between items-center bg-gray-100 p-3 rounded-md shadow"
+                >
                   <span>{relay.device}</span>
                   <button
                     onClick={() => handleDeleteRelay(relayId)}
